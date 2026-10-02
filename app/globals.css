@@ -130,7 +130,7 @@ select.campo { color-scheme: dark; }
 .divisor::before, .divisor::after { content: ""; flex: 1; height: 1px; background: var(--borda); }
 
 /* ---------- registro ---------- */
-.registro { max-width: 980px; margin: 0 auto; }
+.registro { width: 100%; }
 .busca-nf { display: flex; gap: 10px; }
 .busca-nf .campo { flex: 1; font-size: 1rem; padding: 11px 14px; }
 .grade-campos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 14px; }
@@ -220,7 +220,8 @@ th.filtrado .btn-filtro { background: var(--acc); border-color: var(--acc); colo
 .grafico { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px 14px 10px; }
 .grafico-cab { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--borda); padding-bottom: 6px; margin-bottom: 8px; }
 .grafico-cab b { color: var(--roxo); font-size: .9rem; }
-.grafico svg { display: block; width: 100%; height: auto; }
+.grafico-svg { overflow-x: auto; overflow-y: hidden; }
+.grafico-svg svg { display: block; margin: 0 auto; }
 .grafico svg text { fill: #94a3b8; font-family: inherit; }
 .grafico .legenda { font-size: .68rem; color: var(--txt2); display: flex; gap: 14px; margin-top: 4px; }
 .grafico .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
