@@ -45,3 +45,14 @@ export const COLS_HISTORICO = [
   ...sem("data_registro", "placa_road", "motivo", "bairro", "numcarregamento"),
   { key: "dt_saida_br", label: "Dt. Saída" },
 ];
+
+// Roteirização: Peso, Valor, Praça e Carregamento logo depois do Pedido
+const ORDEM_ROT = ["pesobrutotot", "vltotal", "praca", "numcarregamento"];
+function depoisDoPedido(cols) {
+  const meio = cols.filter((c) => ORDEM_ROT.includes(c.key)).sort((a, b) => ORDEM_ROT.indexOf(a.key) - ORDEM_ROT.indexOf(b.key));
+  const resto = cols.filter((c) => !ORDEM_ROT.includes(c.key));
+  const i = resto.findIndex((c) => c.key === "numped");
+  return [...resto.slice(0, i + 1), ...meio, ...resto.slice(i + 1)];
+}
+export const COLS_ROT_PENDENTES = depoisDoPedido(COLS_PADRAO);
+export const COLS_ROT_ROTEIRIZADAS = depoisDoPedido(COLS_ROTEIRIZADAS);

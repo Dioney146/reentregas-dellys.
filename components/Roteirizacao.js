@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Tabela from "./Tabela";
-import { COLS_PADRAO, COLS_ROTEIRIZADAS } from "./colunas";
+import { COLS_ROT_PENDENTES, COLS_ROT_ROTEIRIZADAS } from "./colunas";
 import { dataBR, dataISO, moeda, num, kg, txt } from "../lib/formato";
 
 const pendente = (l) => ["pendente", ""].includes(txt(l.status).toLowerCase());
@@ -98,7 +98,7 @@ function Pendentes({ pend, periodo, hoje, api, recarregar, avisar }) {
 
             <Tabela
               linhas={lista}
-              colunas={COLS_PADRAO}
+              colunas={COLS_ROT_PENDENTES}
               vazio="Nenhuma nota pendente nos filtros."
               classeLinha={(l) => (marcadas.has(String(l.id)) ? "marcada" : "")}
               antes={{
@@ -184,7 +184,7 @@ function Roteirizadas({ rote, periodo, api, recarregar, avisar }) {
             </div>
             <Tabela
               linhas={lista}
-              colunas={COLS_ROTEIRIZADAS}
+              colunas={COLS_ROT_ROTEIRIZADAS}
               depois={{ th: "", td: (l) => <button className="btn mini perigo" onClick={() => devolver(l)} title="Devolver para pendente">↩️ Devolver</button> }}
             />
           </>
