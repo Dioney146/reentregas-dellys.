@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { num } from "../lib/formato";
 
 // Colunas 3D = quantidade de notas (número branco dentro)
@@ -42,29 +42,53 @@ function curva(p) {
   return d;
 }
 
+// quebra o nome em até 3 linhas que cabem embaixo da coluna
+function quebrar(texto, maxCar) {
+  const palavras = String(texto ?? "").split(/\s+|(?<=\/)/).filter(Boolean); // quebra também depois de "/"
+  const linhas = [];
+  let atual = "";
+  for (const p of palavras) {
+    const tenta = atual ? (atual.endsWith("/") ? atual + p : `${atual} ${p}`) : p;
+    if (tenta.length <= maxCar || !atual) atual = tenta;
+    else { linhas.push(atual); atual = p; }
+  }
+  if (atual) linhas.push(atual);
+  const r = linhas.map((l) => (l.length > maxCar ? l.slice(0, maxCar - 1) + "…" : l));
+  if (r.length > 3) { r.length = 3; r[2] = (r[2].length >= maxCar ? r[2].slice(0, maxCar - 1) : r[2]) + "…"; }
+  return r;
+}
+
+// largura real do cartão (o gráfico ocupa a largura toda, sem esticar as letras)
+function useLargura() {
+  const ref = useRef(null);
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    if (!ref.current) return;
+    const ro = new ResizeObserver(([e]) => setW(Math.floor(e.contentRect.width)));
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w];
+}
+
 function Svg({ linhas, rotulo, alto }) {
   const id = "g" + useId().replace(/[^a-zA-Z0-9]/g, "");
+  const [caixa, larguraCaixa] = useLargura();
   const n = linhas.length;
-  const nomes = linhas.map((l) => {
-    const s = String(l[rotulo] ?? "");
-    return s.length > 42 ? s.slice(0, 41) + "…" : s;
-  });
-  const maxCar = Math.max(4, ...nomes.map((s) => s.length));
 
-  // espaço para os nomes inclinados (cabem inteiros)
-  const ang = 35, rad = (ang * Math.PI) / 180;
-  const larguraTexto = maxCar * 6.3;
-  const base = Math.min(230, 22 + larguraTexto * Math.sin(rad));
-  const passo = Math.max(78, Math.min(150, 900 / n));
-  const esq = Math.max(24, Math.min(260, larguraTexto * Math.cos(rad) - passo / 2 + 12));
-  const dir = 34;
-  const larg = esq + passo * n + dir;
+  const esq = 18, dir = 30;
+  const larg = Math.max(larguraCaixa || 600, n * 86 + esq + dir);
+  const passo = (larg - esq - dir) / n;
+  const maxCar = Math.max(6, Math.floor((passo - 8) / 6.6));
+  const nomes = linhas.map((l) => quebrar(l[rotulo], maxCar));
+  const nLinhas = Math.max(1, ...nomes.map((x) => x.length));
+  const base = 16 + nLinhas * 14;
   const topo = 58; // espaço acima da coluna mais alta para a linha e o valor
   const h = alto;
   const altura = topo + h + base;
 
   const prof = 11; // profundidade do efeito 3D
-  const bw = Math.min(46, passo * 0.5);
+  const bw = Math.min(54, passo * 0.42);
   const maxQ = Math.max(1, ...linhas.map((l) => l.qtd));
   const xC = (i) => esq + passo * i + passo / 2;
   const chao = topo + h;
@@ -73,8 +97,8 @@ function Svg({ linhas, rotulo, alto }) {
   const pontos = linhas.map((l, i) => [xC(i) + prof / 2, topoBarra(l.qtd) - prof * 0.7 - 16]);
 
   return (
-    <div className="grafico-svg">
-      <svg viewBox={`0 0 ${larg} ${altura}`} width={larg} height={altura} role="img" style={{ maxWidth: "none" }}>
+    <div className="grafico-svg" ref={caixa}>
+      {larguraCaixa > 0 && <svg viewBox={`0 0 ${larg} ${altura}`} width={larg} height={altura} role="img" style={{ maxWidth: "none" }}>
         <defs>
           <linearGradient id={`${id}f`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#a7f3c0" /><stop offset=".55" stopColor="#34d399" /><stop offset="1" stopColor="#16a34a" />
@@ -117,10 +141,9 @@ function Svg({ linhas, rotulo, alto }) {
                 style={{ fill: "#ffffff", paintOrder: "stroke", stroke: "rgba(5,46,22,.55)", strokeWidth: 2.5 }}>
                 {l.qtd}
               </text>
-              {/* nome inteiro, inclinado */}
-              <text x={xC(i) + 4} y={chao + 14} textAnchor="end" fontSize="11" fontWeight="600"
-                transform={`rotate(-${ang} ${xC(i) + 4} ${chao + 14})`} style={{ fill: "#cbd5e1" }}>
-                {nomes[i]}
+              {/* nome embaixo da coluna, em até 3 linhas */}
+              <text x={xC(i)} y={chao + 16} textAnchor="middle" fontSize="11" fontWeight="600" style={{ fill: "#cbd5e1" }}>
+                {nomes[i].map((t, k) => <tspan key={k} x={xC(i)} dy={k ? 14 : 0}>{t}</tspan>)}
               </text>
             </g>
           );
@@ -139,7 +162,7 @@ function Svg({ linhas, rotulo, alto }) {
             </text>
           </g>
         ))}
-      </svg>
+      </svg>}
     </div>
   );
 }
