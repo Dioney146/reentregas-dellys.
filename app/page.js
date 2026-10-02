@@ -38,16 +38,16 @@ export default function App() {
 
 function Login({ aoEntrar }) {
   const [u, setU] = useState("");
-  const [s, setS] = useState("");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
 
   async function entrar(e) {
     e.preventDefault();
+    if (u.trim().length < 2) return setErro("Digite seu nome.");
     setEnviando(true);
     setErro("");
     try {
-      const j = await api("/api/login", { method: "POST", body: JSON.stringify({ usuario: u.trim().toLowerCase(), senha: s }) });
+      const j = await api("/api/login", { method: "POST", body: JSON.stringify({ usuario: u }) });
       aoEntrar(j.usuario);
     } catch (e) {
       setErro(e.message);
@@ -59,12 +59,12 @@ function Login({ aoEntrar }) {
   return (
     <div className="login">
       <form onSubmit={entrar}>
-        <h1>🔒 Delly's — Transferências</h1>
-        <p>Faça login para continuar</p>
-        <label>Usuário<input className="campo" value={u} onChange={(e) => setU(e.target.value)} autoFocus autoComplete="username" /></label>
-        <label>Senha<input className="campo" type="password" value={s} onChange={(e) => setS(e.target.value)} autoComplete="current-password" /></label>
+        <h1>🚛 Delly's — Transferências</h1>
+        <p>Sem senha — informe seu nome para entrar</p>
+        <label>Seu nome<input className="campo" value={u} onChange={(e) => setU(e.target.value)} autoFocus autoComplete="name" placeholder="Ex.: Dioney" /></label>
         {erro && <div className="aviso erro">❌ {erro}</div>}
-        <button className="btn primario grande" disabled={enviando}>{enviando ? "Entrando…" : "Entrar"}</button>
+        <button className="btn primario grande" disabled={enviando || u.trim().length < 2}>{enviando ? "Entrando…" : "Entrar"}</button>
+        <p style={{ margin: 0, fontSize: ".72rem" }}>Nas próximas vezes você entra direto.</p>
       </form>
     </div>
   );
@@ -221,7 +221,7 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
             <div className="popover">
               <h4 style={{ textTransform: "capitalize" }}>{usuario}</h4>
               <small>Painel de Transferências · Delly's</small>
-              <button className="btn grande" style={{ marginTop: 10 }} onClick={sair}>🚪 Sair</button>
+              <button className="btn grande" style={{ marginTop: 10 }} onClick={sair}>🚪 Trocar de usuário</button>
             </div>
           )}
         </div>
