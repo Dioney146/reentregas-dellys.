@@ -113,7 +113,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
 
             {cur.placa_road && <div className="aviso alerta">⚠️ Essa nota teve entrega anterior com placa <b>&nbsp;{cur.placa_road}</b>.</div>}
             {cur.placa_road && !cur.motorista && !cur.entregador && (
-              <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> no Frete / Saídas (nem na aba Nomes).</div>
+              <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> no Retorno (nem na aba Nomes).</div>
             )}
             {origemNomes(resultado?.origemNomes, cur.placa_road)}
             <div className="aviso info">ℹ️ A nova placa e data de saída serão informadas pela <b>&nbsp;Roteirização</b>.</div>
@@ -177,8 +177,8 @@ function origemNomes(o, placa) {
   const br = data ? `${data.slice(8, 10)}/${data.slice(5, 7)}/${data.slice(0, 4)}` : "";
   return (
     <div className="aviso ok">
-      👤 Motorista e entregador puxados do <b>&nbsp;Frete / Saídas&nbsp;</b> de {br} (placa {placa})
-      {tipo !== "exato" ? " — frete mais recente dessa placa" : ""}.
+      👤 Motorista e entregador puxados do <b>&nbsp;Retorno&nbsp;</b> de {br} (placa {placa})
+      {tipo !== "exato" ? " — Retorno mais recente dessa placa" : ""}.
     </div>
   );
 }
