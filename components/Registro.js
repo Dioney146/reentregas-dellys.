@@ -113,8 +113,9 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
 
             {cur.placa_road && <div className="aviso alerta">⚠️ Essa nota teve entrega anterior com placa <b>&nbsp;{cur.placa_road}</b>.</div>}
             {cur.placa_road && !cur.motorista && !cur.entregador && (
-              <div className="aviso info">ℹ️ Nenhum motorista/entregador cadastrado na aba <b>&nbsp;Nomes&nbsp;</b> para a placa <b>&nbsp;{cur.placa_road}</b>.</div>
+              <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> no Frete / Saídas (nem na aba Nomes).</div>
             )}
+            {origemNomes(resultado?.origemNomes, cur.placa_road)}
             <div className="aviso info">ℹ️ A nova placa e data de saída serão informadas pela <b>&nbsp;Roteirização</b>.</div>
 
             <div className="divisor">📋 Motivo da Transferência</div>
@@ -164,6 +165,20 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// de onde vieram motorista e entregador
+function origemNomes(o, placa) {
+  if (!o) return null;
+  if (o === "nomes") return <div className="aviso info">👤 Motorista e entregador da aba <b>&nbsp;Nomes</b>.</div>;
+  const [, data, tipo] = o.split(":");
+  const br = data ? `${data.slice(8, 10)}/${data.slice(5, 7)}/${data.slice(0, 4)}` : "";
+  return (
+    <div className="aviso ok">
+      👤 Motorista e entregador puxados do <b>&nbsp;Frete / Saídas&nbsp;</b> de {br} (placa {placa})
+      {tipo !== "exato" ? " — frete mais recente dessa placa" : ""}.
     </div>
   );
 }
