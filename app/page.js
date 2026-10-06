@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Registro from "../components/Registro";
 import Roteirizacao from "../components/Roteirizacao";
 import Historico from "../components/Historico";
-import { URL_CONTROLE, JANELA_ATIVO_MIN } from "../lib/constantes";
+import { URL_CONTROLE, URL_DEVOLUCOES, JANELA_ATIVO_MIN } from "../lib/constantes";
 import { agoraManaus, dataBR } from "../lib/formato";
 
 const ABAS = [
@@ -202,6 +202,9 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
       <div className="topo-dir" ref={ref}>
         <a className="link-outro" href={URL_CONTROLE} target="_blank" rel="noopener noreferrer" title="Abrir o Controle de Entregas">
           🚚 <span>Controle de Entregas</span> ↗
+        </a>
+        <a className="link-outro" href={URL_DEVOLUCOES} target="_blank" rel="noopener noreferrer" title="Abrir o site de Devoluções">
+          📦 <span>Devoluções</span> ↗
         </a>
         <div className="pilula" onClick={() => setAberto(aberto === "ativos" ? null : "ativos")} title="Usuários ativos agora">
           <span className="ponto-verde" /> {ativos.length}
