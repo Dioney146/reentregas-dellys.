@@ -59,7 +59,8 @@ function Login({ aoEntrar }) {
   return (
     <div className="login">
       <form onSubmit={entrar}>
-        <h1>🚛 Delly's — Transferências</h1>
+        <img src="/logo-dellys-branco.png" alt="Delly's Food Service" className="logo-login" />
+        <h1>Transferências</h1>
         <p>Sem senha — informe seu nome para entrar</p>
         <label>Seu nome<input className="campo" value={u} onChange={(e) => setU(e.target.value)} autoFocus autoComplete="name" placeholder="Ex.: Dioney" /></label>
         {erro && <div className="aviso erro">❌ {erro}</div>}
@@ -191,7 +192,7 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
   return (
     <header className="topo">
       <div className="marca">
-        <div className="marca-logo">🚛</div>
+        <img src="/logo-d.png" alt="" className="marca-logo-img" />
         <div><b>Delly's <span>Transferências</span></b><small>Registro de Transferência</small></div>
       </div>
       <nav className="abas">
