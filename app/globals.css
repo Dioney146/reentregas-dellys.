@@ -267,3 +267,12 @@ th.filtrado .btn-filtro { background: var(--acc); border-color: var(--acc); colo
 .grafico { min-width: 0; }
 .grafico { display: flex; flex-direction: column; }
 .grafico .legenda { margin-top: auto; padding-top: 4px; }
+
+/* registro retroativo */
+.retro-linha { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; min-height: 30px; }
+.retro-check { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-weight: 600; color: var(--txt2); font-size: .85rem; }
+.retro-check small { font-weight: 400; color: var(--txt3); }
+.retro-check input { accent-color: #f59e0b; width: 15px; height: 15px; }
+.retro-data { display: flex; flex-direction: column; gap: 4px; font-size: .72rem; color: #fbbf24; text-transform: uppercase; letter-spacing: .04em; font-weight: 700; }
+.retro-data .campo { border-color: rgba(245,158,11,.55); }
+.retro-info { font-size: .78rem; color: var(--txt3); }
