@@ -17,16 +17,20 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
   const [bairro, setBairro] = useState("");
   const [erroForm, setErroForm] = useState("");
   const [salvando, setSalvando] = useState(false);
+  // registro retroativo: a nota voltou num dia anterior (os nomes vêm do Retorno daquele dia)
+  const [retro, setRetro] = useState(false);
+  const [dataRetro, setDataRetro] = useState("");
+  const dataRetorno = retro && dataRetro ? dataRetro : hoje.iso;
 
   const cur = resultado?.nota;
 
-  async function buscar(e) {
-    e?.preventDefault();
+  async function buscar(e, dataUsar = dataRetorno) {
+    e?.preventDefault?.();
     if (!nf.trim()) { setResultado({ erro: "Informe o número da nota fiscal.", tipo: "alerta" }); return; }
     setBuscando(true);
     setErroForm("");
     try {
-      const r = await api(`/api/nota?nf=${encodeURIComponent(nf.trim())}`);
+      const r = await api(`/api/nota?nf=${encodeURIComponent(nf.trim())}&data=${dataUsar}`);
       setResultado(r);
       setMotivo(""); setMotivoOutro(""); setBairro("");
     } catch (e) {
@@ -40,13 +44,16 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
     const m = motivo === OUTRO ? motivoOutro.trim() : motivo;
     if (!m) return setErroForm(motivo === OUTRO ? "Digite o Motivo no campo acima antes de confirmar." : "Selecione um Motivo antes de confirmar.");
     if (!BAIRROS_MANAUS.includes(bairro)) return setErroForm("Selecione um Bairro da lista antes de confirmar.");
+    if (retro && !dataRetro) return setErroForm("Registro retroativo: informe a data em que a nota voltou.");
     setSalvando(true);
     setErroForm("");
     try {
-      await api("/api/transferencias", { method: "POST", body: JSON.stringify({ ...cur, motivo: m, bairro }) });
-      avisar(`✅ Transferência registrada! Nota ${cur.numnota} aguarda roteirização.`);
+      const dtRet = resultado?.dataRetorno || dataRetorno;
+      await api("/api/transferencias", { method: "POST", body: JSON.stringify({ ...cur, motivo: m, bairro, dt_retorno: dtRet }) });
+      avisar(`✅ Transferência registrada${dtRet !== hoje.iso ? ` (retroativa: ${br(dtRet)})` : ""}! Nota ${cur.numnota} aguarda roteirização.`);
       setResultado(null);
       setNf("");
+      setRetro(false); setDataRetro(""); // volta para o padrão (hoje)
       recarregar();
     } catch (e) {
       setErroForm(e.message);
@@ -74,6 +81,24 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
       <div className="cartao">
         <div className="cartao-corpo">
           <div className="rotulo" style={{ marginBottom: 8 }}>🔍 Buscar Nota Fiscal</div>
+          <div className="retro-linha">
+            <label className="retro-check">
+              <input type="checkbox" checked={retro} onChange={(e) => {
+                const on = e.target.checked; setRetro(on);
+                if (!on) { setDataRetro(""); if (cur) buscar(null, hoje.iso); }
+              }} />
+              📅 Registro retroativo <small>(a nota voltou em outro dia)</small>
+            </label>
+            {retro && (
+              <label className="retro-data">Data em que a nota voltou
+                <input className="campo" type="date" max={hoje.iso} value={dataRetro} onChange={(e) => {
+                  const d = e.target.value; setDataRetro(d);
+                  if (cur && d) buscar(null, d); // já busca os nomes do Retorno desse dia
+                }} />
+              </label>
+            )}
+            {!retro && <span className="retro-info">Motorista e entregador do Retorno de <b>{hoje.br}</b> (hoje)</span>}
+          </div>
           <form className="busca-nf" onSubmit={buscar}>
             <input className="campo" placeholder="Pesquisar por número da nota fiscal…" value={nf} onChange={(e) => setNf(e.target.value)} inputMode="numeric" autoFocus />
             <button className="btn primario" disabled={buscando}>{buscando ? "Buscando…" : "Buscar"}</button>
@@ -112,8 +137,16 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
             </div>
 
             {cur.placa_road && <div className="aviso alerta">⚠️ Essa nota teve entrega anterior com placa <b>&nbsp;{cur.placa_road}</b>.</div>}
+            {cur.placa_road && !String(resultado?.origemNomes || "").endsWith(":retorno") && (
+              <div className="aviso alerta">
+                ⚠️ A placa <b>&nbsp;{cur.placa_road}&nbsp;</b> não está no Retorno de <b>&nbsp;{br(resultado?.dataRetorno || dataRetorno)}</b>.
+                {retro
+                  ? " Confira a data em que a nota voltou."
+                  : <>{" "}Se a nota voltou em outro dia, marque <b>&nbsp;📅 Registro retroativo&nbsp;</b> e escolha a data.</>}
+              </div>
+            )}
             {cur.placa_road && !cur.motorista && !cur.entregador && (
-              <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> no Retorno (nem na aba Nomes).</div>
+              <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> (nem no Retorno, nem na aba Nomes).</div>
             )}
             {origemNomes(resultado?.origemNomes, cur.placa_road)}
             <div className="aviso info">ℹ️ A nova placa e data de saída serão informadas pela <b>&nbsp;Roteirização</b>.</div>
@@ -170,15 +203,16 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
 }
 
 // de onde vieram motorista e entregador
+const br = (iso) => (iso && iso[4] === "-" ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : iso || "");
+
 function origemNomes(o, placa) {
   if (!o) return null;
   if (o === "nomes") return <div className="aviso info">👤 Motorista e entregador da aba <b>&nbsp;Nomes</b>.</div>;
   const [, data, tipo] = o.split(":");
-  const br = data ? `${data.slice(8, 10)}/${data.slice(5, 7)}/${data.slice(0, 4)}` : "";
   return (
-    <div className="aviso ok">
-      👤 Motorista e entregador puxados do <b>&nbsp;Retorno&nbsp;</b> de {br} (placa {placa})
-      {tipo !== "exato" ? " — Retorno mais recente dessa placa" : ""}.
+    <div className={`aviso ${tipo === "retorno" ? "ok" : "info"}`}>
+      👤 Motorista e entregador puxados do <b>&nbsp;Retorno&nbsp;</b> de {br(data)} (placa {placa})
+      {tipo === "entrega" ? " — dia da entrega na ROAD" : ""}.
     </div>
   );
 }
