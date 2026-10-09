@@ -149,6 +149,11 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
               <div className="aviso info">ℹ️ Não achei motorista/entregador da placa <b>&nbsp;{cur.placa_road}&nbsp;</b> (nem no Retorno, nem na aba Nomes).</div>
             )}
             {origemNomes(resultado?.origemNomes, cur.placa_road)}
+            {resultado?.trocaPlaca && (
+              <div className="troca-placa" title="Placa trocada no Frete / Saídas do Controle de Entregas">
+                ⇄ Placa trocada no frete: <b>{resultado.trocaPlaca.de}</b> <span>»</span> <b>{resultado.trocaPlaca.para}</b>
+              </div>
+            )}
             <div className="aviso info">ℹ️ A nova placa e data de saída serão informadas pela <b>&nbsp;Roteirização</b>.</div>
 
             <div className="divisor">📋 Motivo da Transferência</div>
@@ -208,10 +213,10 @@ const br = (iso) => (iso && iso[4] === "-" ? `${iso.slice(8, 10)}/${iso.slice(5,
 function origemNomes(o, placa) {
   if (!o) return null;
   if (o === "nomes") return <div className="aviso info">👤 Motorista e entregador da aba <b>&nbsp;Nomes</b>.</div>;
-  const [, data, tipo, placaNova] = o.split(":");
+  const [, data, tipo] = o.split(":");
   return (
     <div className={`aviso ${tipo === "retorno" ? "ok" : "info"}`}>
-      👤 Motorista e entregador puxados do <b>&nbsp;Retorno&nbsp;</b> de {br(data)} (placa {placaNova ? <>{placaNova} — no frete a placa {placa} foi trocada por ela</> : placa})
+      👤 Motorista e entregador puxados do <b>&nbsp;Retorno&nbsp;</b> de {br(data)} (placa {placa})
       {tipo === "entrega" ? " — dia da entrega na ROAD" : ""}.
     </div>
   );
