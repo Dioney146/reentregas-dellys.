@@ -62,10 +62,10 @@ function Login({ aoEntrar }) {
         <img src="/logo-dellys-branco.png" alt="Delly's Food Service" className="logo-login" />
         <h1>Transferências</h1>
         <p>Sem senha — informe seu nome para entrar</p>
-        <label>Seu nome<input className="campo" value={u} onChange={(e) => setU(e.target.value)} autoFocus autoComplete="name" placeholder="Ex.: Dioney" /></label>
+        <label>Seu nome<input className="campo" value={u} onChange={(e) => { setU(e.target.value); setErro(""); }} autoFocus autoComplete="name" placeholder="Ex.: Dioney" /></label>
         {erro && <div className="aviso erro">❌ {erro}</div>}
         <button className="btn primario grande" disabled={enviando || u.trim().length < 2}>{enviando ? "Entrando…" : "Entrar"}</button>
-        <p style={{ margin: 0, fontSize: ".72rem" }}>Nas próximas vezes você entra direto.</p>
+        <p style={{ margin: 0, fontSize: ".72rem" }}>Use <b>seu nome</b> (ex.: Maria Souza) — códigos, números e nomes como "teste" não são aceitos. Nas próximas vezes você entra direto.</p>
       </form>
     </div>
   );

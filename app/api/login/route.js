@@ -1,10 +1,13 @@
 import { abrirSessao } from "../../../lib/sessao";
+import { erroNome, normalizarNome } from "../../../lib/nome";
 
-// Entrada sem senha: a pessoa só informa o nome (serve para mostrar quem está ativo)
+// Entrada sem senha: a pessoa informa o NOME (identifica quem está ativo e quem fez cada registro).
+// Códigos, números e nomes genéricos (TESTE, PLANILHA, ADMIN...) são recusados.
 export async function POST(req) {
   const { usuario } = await req.json().catch(() => ({}));
-  const nome = String(usuario || "").trim().toLowerCase().replace(/\s+/g, " ");
-  if (nome.length < 2) return Response.json({ erro: "Digite seu nome." }, { status: 400 });
-  await abrirSessao(nome.slice(0, 40));
+  const erro = erroNome(usuario);
+  if (erro) return Response.json({ erro }, { status: 400 });
+  const nome = normalizarNome(usuario).toLowerCase();
+  await abrirSessao(nome);
   return Response.json({ usuario: nome });
 }
