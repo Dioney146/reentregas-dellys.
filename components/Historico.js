@@ -122,6 +122,7 @@ export default function Historico({ linhas, todas, periodo, nomeArquivo }) {
           <Tabela
             linhas={tabela}
             colunas={COLS_HISTORICO}
+            celular={{ campos: ["status", "data_registro", "placa_road", "placa_veiculo", "motivo", "bairro", "dt_saida_br", "pesobrutotot", "vltotal"] }}
             vazio="Nenhum registro encontrado para os filtros selecionados."
             rodape={(vis) => <button className="btn mini" onClick={() => baixarExcel(vis)}>⬇️ Excel</button>}
           />

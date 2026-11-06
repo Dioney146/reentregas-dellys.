@@ -100,7 +100,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
             {!retro && <span className="retro-info">Motorista e entregador do Retorno de <b>{hoje.br}</b> (hoje)</span>}
           </div>
           <form className="busca-nf" onSubmit={buscar}>
-            <input className="campo" placeholder="Pesquisar por número da nota fiscal…" value={nf} onChange={(e) => setNf(e.target.value)} inputMode="numeric" autoFocus />
+            <input className="campo" placeholder="Nº da nota fiscal" aria-label="Número da nota fiscal" value={nf} onChange={(e) => setNf(e.target.value)} inputMode="numeric" enterKeyHint="search" autoComplete="off" autoFocus />
             <button className="btn primario" disabled={buscando}>{buscando ? "Buscando…" : "Buscar"}</button>
           </form>
           {resultado?.erro && (
@@ -122,7 +122,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
               <Campo r="Pedido" v={cur.numped} />
               <Campo r="Nota Fiscal" v={cur.numnota} />
               <Campo r="Carregamento" v={cur.numcarregamento} />
-              <Campo r="Cliente" v={cur.nomecliente} />
+              <Campo r="Cliente" v={cur.nomecliente} largo />
               <Campo r="Cód. Cliente" v={cur.codcliente} />
               <Campo r="Data Liberado" v={cur.dt_liberado} />
               <Campo r="Vendedor" v={cur.nomevend} />
@@ -157,7 +157,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
             <div className="aviso info">ℹ️ A nova placa e data de saída serão informadas pela <b>&nbsp;Roteirização</b>.</div>
 
             <div className="divisor">📋 Motivo da Transferência</div>
-            <select className="campo" style={{ width: "100%" }} value={motivo} onChange={(e) => { setMotivo(e.target.value); setErroForm(""); }}>
+            <select className="campo" style={{ width: "100%" }} aria-label="Motivo da transferência" value={motivo} onChange={(e) => { setMotivo(e.target.value); setErroForm(""); }}>
               <option value="">— Selecione um motivo —</option>
               {MOTIVOS.map((m) => <option key={m}>{m}</option>)}
               <option>{OUTRO}</option>
@@ -171,7 +171,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
 
             {erroForm && <div className="aviso erro">❌ {erroForm}</div>}
             <div style={{ height: 14 }} />
-            <button className="btn primario grande" onClick={confirmar} disabled={salvando}>
+            <button className="btn primario grande btn-confirmar" onClick={confirmar} disabled={salvando}>
               {salvando ? "Salvando…" : "🚛 Confirmar Transferência"}
             </button>
           </div>
@@ -197,6 +197,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
               <Tabela
                 linhas={doDia}
                 colunas={COLS_PADRAO}
+                celular={{ campos: ["placa_road", "motorista", "entregador", "motivo", "bairro", "numped", "pesobrutotot", "vltotal"] }}
                 depois={{ th: "", td: (l) => <button className="btn mini perigo" title={`Excluir ID ${l.id}`} onClick={() => excluir(l)}>🗑️</button> }}
               />
             </div>
@@ -222,8 +223,8 @@ function origemNomes(o, placa) {
   );
 }
 
-function Campo({ r, v }) {
-  return <label>{r}<input className="campo" value={txt(v) || "—"} disabled readOnly /></label>;
+function Campo({ r, v, largo }) {
+  return <label className={largo ? "largo" : ""}>{r}<input className="campo" value={txt(v) || "—"} disabled readOnly /></label>;
 }
 
 // Bairro: pesquisa na lista oficial (só aceita bairro da lista)
@@ -248,7 +249,7 @@ function ComboBairro({ valor, aoMudar }) {
   return (
     <div className="combo" ref={caixa}>
       <input
-        className="campo" style={{ width: "100%" }} placeholder="— Selecione ou digite o bairro —"
+        className="campo" style={{ width: "100%" }} aria-label="Bairro" autoComplete="off" placeholder="— Selecione ou digite o bairro —"
         value={busca}
         onFocus={() => { setAberto(true); setSel(0); }}
         onChange={(e) => { setBusca(e.target.value); setAberto(true); setSel(0); if (valor) aoMudar(""); }}

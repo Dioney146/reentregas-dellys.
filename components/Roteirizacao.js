@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCelular } from "../lib/useCelular";
 import Tabela from "./Tabela";
 import { COLS_ROT_PENDENTES, COLS_ROT_ROTEIRIZADAS } from "./colunas";
 import { dataBR, dataISO, moeda, num, kg, txt } from "../lib/formato";
@@ -24,6 +25,7 @@ export default function Roteirizacao({ linhas, periodo, hoje, api, recarregar, a
 }
 
 function Pendentes({ pend, periodo, hoje, api, recarregar, avisar }) {
+  const celular = useCelular();
   const [busca, setBusca] = useState("");
   const [dataSel, setDataSel] = useState("Todas");
   const [marcadas, setMarcadas] = useState(() => new Set());
@@ -101,6 +103,7 @@ function Pendentes({ pend, periodo, hoje, api, recarregar, avisar }) {
               colunas={COLS_ROT_PENDENTES}
               vazio="Nenhuma nota pendente nos filtros."
               classeLinha={(l) => (marcadas.has(String(l.id)) ? "marcada" : "")}
+              celular={{ campos: ["data_registro", "placa_road", "motivo", "bairro", "praca", "numcarregamento", "pesobrutotot", "vltotal"], aoTocar: (l) => alternar(String(l.id)) }}
               antes={{
                 th: (vis) => {
                   const todas = vis.length > 0 && vis.every((l) => marcadas.has(String(l.id)));
@@ -113,10 +116,11 @@ function Pendentes({ pend, periodo, hoje, api, recarregar, avisar }) {
                       }} />
                   );
                 },
-                td: (l) => <input type="checkbox" checked={marcadas.has(String(l.id))} onChange={() => alternar(String(l.id))} />,
+                td: (l) => <input type="checkbox" aria-label={`Marcar nota ${l.numnota}`} checked={marcadas.has(String(l.id))} onChange={() => alternar(String(l.id))} />,
               }}
             />
 
+            <div className={`lote ${celular && sel.length ? "lote-fixo" : ""}`}>
             <div className="divisor">🗺️ Roteirizar notas</div>
             {sel.length > 0 ? (
               <div className="chips-resumo">
@@ -130,16 +134,18 @@ function Pendentes({ pend, periodo, hoje, api, recarregar, avisar }) {
             )}
             <div className="form-lote">
               <label className="rotulo">Nova Placa
-                <input className="campo" placeholder="Ex: ABC-1234" value={placa} onChange={(e) => setPlaca(e.target.value.toUpperCase())} />
+                <input className="campo" placeholder="Ex: ABC-1234" value={placa} autoCapitalize="characters" autoComplete="off" onChange={(e) => setPlaca(e.target.value.toUpperCase())} />
               </label>
               <label className="rotulo">Data de Saída
                 <input className="campo" type="date" value={dtSaida} onChange={(e) => setDtSaida(e.target.value)} />
               </label>
-              <button className="btn primario" onClick={roteirizar} disabled={enviando} style={{ height: 38 }}>
+              <button className="btn primario btn-roteirizar" onClick={roteirizar} disabled={enviando} style={{ minHeight: 38 }}>
                 {enviando ? "Roteirizando…" : sel.length ? `✅ Roteirizar ${sel.length} nota(s)` : "✅ Roteirizar"}
               </button>
             </div>
             {erro && <div className="aviso erro">⚠️ {erro}</div>}
+            </div>
+            {celular && sel.length > 0 && <div className="espaco-lote" />}
           </>
         )}
       </div>
@@ -185,6 +191,7 @@ function Roteirizadas({ rote, periodo, api, recarregar, avisar }) {
             <Tabela
               linhas={lista}
               colunas={COLS_ROT_ROTEIRIZADAS}
+              celular={{ campos: ["placa_road", "placa_veiculo", "dt_saida_br", "motivo", "bairro", "numcarregamento", "pesobrutotot", "vltotal"] }}
               depois={{ th: "", td: (l) => <button className="btn mini perigo" onClick={() => devolver(l)} title="Devolver para pendente">↩️ Devolver</button> }}
             />
           </>
@@ -229,6 +236,7 @@ function RelatorioPlaca({ rote, periodo }) {
               { key: "peso", label: "Peso (kg)", tipo: "peso" },
               { key: "valor", label: "Valor (R$)", tipo: "moeda" },
             ]}
+            celular={{ titulo: (g) => <>🚚 {g.placa_veiculo} <span>{g.data_registro}</span></>, campos: ["qtd_clientes", "peso", "valor"] }}
             rodape={(vis) => (
               <span>
                 🚚 {new Set(vis.map((g) => g.placa_veiculo)).size} placa(s) · 👤 {totClientes} cliente(s) único(s) ·
