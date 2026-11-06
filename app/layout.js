@@ -5,6 +5,8 @@ export const metadata = {
   description: "Registro e roteirização de transferências de notas",
 };
 
+export const viewport = { width: "device-width", initialScale: 1, themeColor: "#060b16", viewportFit: "cover" };
+
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">

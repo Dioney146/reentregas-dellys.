@@ -8,9 +8,9 @@ import { URL_CONTROLE, URL_DEVOLUCOES, JANELA_ATIVO_MIN } from "../lib/constante
 import { agoraManaus, dataBR } from "../lib/formato";
 
 const ABAS = [
-  { k: "registro", t: "📝 Registro" },
-  { k: "roteirizacao", t: "🗺️ Roteirização" },
-  { k: "historico", t: "📋 Histórico" },
+  { k: "registro", ico: "📝", t: "Registro" },
+  { k: "roteirizacao", ico: "🗺️", t: "Roteirização" },
+  { k: "historico", ico: "📋", t: "Histórico" },
 ];
 
 // chamada à API: devolve o JSON ou lança o erro com a mensagem do servidor
@@ -149,13 +149,13 @@ function Painel({ usuario, aoSair }) {
       <main className="corpo">
         {aba !== "registro" && (
           <div className="barra-filtro">
-            <label className="rotulo">📅 Data
-              <input className="campo" type="date" value={dataFiltro} onChange={(e) => e.target.value && setDataFiltro(e.target.value)} />
+            <label className="rotulo bf-data">📅 Data
+              <input className="campo" type="date" value={dataFiltro} disabled={verTodas} onChange={(e) => e.target.value && setDataFiltro(e.target.value)} />
             </label>
-            <button className={`btn ${verTodas ? "ativo" : ""}`} style={{ height: 38 }} onClick={() => setVerTodas(!verTodas)}>
+            <button className={`btn bf-todas ${verTodas ? "ativo" : ""}`} onClick={() => setVerTodas(!verTodas)} aria-pressed={verTodas}>
               {verTodas ? "✓ Todas as datas" : "Todas as datas"}
             </button>
-            <button className="btn" style={{ height: 38 }} onClick={carregar} title="Buscar novidades na planilha">⟳ Atualizar</button>
+            <button className="btn bf-atualizar" onClick={carregar} title="Buscar novidades na planilha" aria-label="Atualizar">⟳ <span>Atualizar</span></button>
           </div>
         )}
         {aba !== "registro" && !verTodas && dataFiltro !== hoje.iso && (
@@ -175,7 +175,15 @@ function Painel({ usuario, aoSair }) {
           <Historico linhas={doPeriodo} todas={linhas} periodo={periodo} nomeArquivo={verTodas ? "todas" : dataFiltro} />
         )}
       </main>
-      {toast && <div key={toast.id} className={`toast ${toast.tipo}`}>{toast.msg}</div>}
+      {toast && <div key={toast.id} className={`toast ${toast.tipo}`} role="status">{toast.msg}</div>}
+      {/* celular: abas embaixo, no alcance do polegar */}
+      <nav className="abas-celular" aria-label="Abas">
+        {ABAS.map((a) => (
+          <button key={a.k} className={aba === a.k ? "ativa" : ""} onClick={() => { setAba(a.k); window.scrollTo({ top: 0 }); }} aria-current={aba === a.k ? "page" : undefined}>
+            <span aria-hidden="true">{a.ico}</span>{a.t}
+          </button>
+        ))}
+      </nav>
     </>
   );
 }
@@ -197,7 +205,7 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
       </div>
       <nav className="abas">
         {ABAS.map((a) => (
-          <button key={a.k} className={`aba ${aba === a.k ? "ativa" : ""}`} onClick={() => setAba(a.k)}>{a.t}</button>
+          <button key={a.k} className={`aba ${aba === a.k ? "ativa" : ""}`} onClick={() => setAba(a.k)}>{a.ico} {a.t}</button>
         ))}
       </nav>
       <div className="topo-dir" ref={ref}>
@@ -207,7 +215,7 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
         <a className="link-outro" href={URL_DEVOLUCOES} target="_blank" rel="noopener noreferrer" title="Abrir o site de Devoluções">
           📦 <span>Devoluções</span> ↗
         </a>
-        <div className="pilula" onClick={() => setAberto(aberto === "ativos" ? null : "ativos")} title="Usuários ativos agora">
+        <div className="pilula" role="button" tabIndex={0} aria-label="Usuários ativos agora" onClick={() => setAberto(aberto === "ativos" ? null : "ativos")} title="Usuários ativos agora">
           <span className="ponto-verde" /> {ativos.length}
           {aberto === "ativos" && (
             <div className="popover" onClick={(e) => e.stopPropagation()}>
@@ -218,13 +226,17 @@ function Topo({ aba, setAba, usuario, ativos, sair }) {
           )}
         </div>
         <div style={{ position: "relative" }}>
-          <div className="avatar" onClick={() => setAberto(aberto === "usuario" ? null : "usuario")} title="Minha conta">
+          <div className="avatar" role="button" tabIndex={0} aria-label="Minha conta" onClick={() => setAberto(aberto === "usuario" ? null : "usuario")} title="Minha conta">
             {usuario.slice(0, 1).toUpperCase()}
           </div>
           {aberto === "usuario" && (
             <div className="popover">
               <h4 style={{ textTransform: "capitalize" }}>{usuario}</h4>
               <small>Painel de Transferências · Delly's</small>
+              <div className="pop-links">
+                <a className="btn grande" href={URL_CONTROLE} target="_blank" rel="noopener noreferrer">🚚 Controle de Entregas ↗</a>
+                <a className="btn grande" href={URL_DEVOLUCOES} target="_blank" rel="noopener noreferrer">📦 Devoluções ↗</a>
+              </div>
               <button className="btn grande" style={{ marginTop: 10 }} onClick={sair}>🚪 Trocar de usuário</button>
             </div>
           )}

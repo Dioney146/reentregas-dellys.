@@ -289,3 +289,127 @@ th.filtrado .btn-filtro { background: var(--acc); border-color: var(--acc); colo
 }
 .troca-placa b { color: #fde68a; letter-spacing: .03em; }
 .troca-placa span { color: #f59e0b; font-weight: 700; }
+
+/* =====================================================================
+   CELULAR — tudo grande, fácil de tocar e com as abas embaixo
+   ===================================================================== */
+.abas-celular { display: none; }
+.pop-links { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.pop-links .btn { text-decoration: none; justify-content: flex-start; }
+.cartoes, .cartoes-topo { display: none; }
+.bf-atualizar span { display: inline; }
+
+@media (max-width: 700px) {
+  body { font-size: 15px; -webkit-tap-highlight-color: transparent; }
+  /* iPhone não dá zoom sozinho em campo com fonte 16px ou mais */
+  .campo, select.campo, input.campo { font-size: 16px; min-height: 46px; padding: 10px 12px; border-radius: 11px; }
+  .btn { min-height: 44px; padding: 10px 14px; border-radius: 11px; }
+  .btn.mini { min-height: 36px; padding: 6px 10px; font-size: .82rem; }
+  .btn.grande { min-height: 52px; font-size: 1rem; }
+
+  /* topo enxuto; links para os outros sites ficam no menu do avatar */
+  .topo { padding: 8px 14px; padding-top: calc(8px + env(safe-area-inset-top)); gap: 10px; flex-wrap: nowrap; }
+  .topo .abas, .link-outro { display: none; }
+  .marca small { display: none; }
+  .marca b { font-size: .98rem; }
+  .pilula { padding: 8px 10px; }
+  .avatar { width: 40px; height: 40px; font-size: 1rem; }
+  .popover { position: fixed; left: 12px; right: 12px; top: calc(62px + env(safe-area-inset-top)); min-width: 0; }
+
+  /* abas embaixo (polegar) */
+  .abas-celular {
+    display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(6, 11, 22, .96); border-top: 1px solid var(--borda-forte); backdrop-filter: blur(14px);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+  }
+  .abas-celular button {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px;
+    border: 0; background: none; color: var(--txt2); font-weight: 700; font-size: .74rem; border-radius: 12px; cursor: pointer;
+  }
+  .abas-celular button span { font-size: 1.35rem; line-height: 1; }
+  .abas-celular button.ativa { color: #fff; background: linear-gradient(135deg, var(--acc), var(--acc-2)); }
+  .corpo { padding: 12px 12px calc(96px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(84px + env(safe-area-inset-bottom)); width: calc(100vw - 24px); text-align: center; }
+
+  /* filtro de data numa linha só */
+  .barra-filtro { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: end; justify-content: stretch; margin-bottom: 12px; }
+  .bf-data .campo { width: 100%; }
+  .bf-todas { white-space: normal; line-height: 1.1; max-width: 104px; }
+  .bf-atualizar span { display: none; }
+  .bf-atualizar { font-size: 1.2rem; width: 46px; padding: 0; }
+
+  /* cartões: deixa o conteúdo "grudar" embaixo (botão de confirmar sempre à vista) */
+  /* sem blur no celular: o blur prende os elementos fixos dentro do cartão (e pesa no aparelho) */
+  .cartao { overflow: visible; border-radius: 16px; margin-bottom: 14px; backdrop-filter: none; background: rgba(15, 23, 42, .94); }
+  .aviso { display: block; }
+  .grade-campos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
+  .grade-campos .campo { width: 100%; }
+  .retro-check { flex-wrap: wrap; }
+  .cartao-cab { padding: 12px 14px; }
+  .cartao-corpo { padding: 12px 14px; }
+  .aviso { font-size: .88rem; }
+
+  /* registro */
+  .retro-linha { flex-direction: column; align-items: stretch; gap: 8px; }
+  .retro-check { font-size: .92rem; min-height: 40px; }
+  .retro-check input { width: 22px; height: 22px; }
+  .retro-data .campo { width: 100%; }
+  .busca-nf .campo { font-size: 18px; letter-spacing: .04em; }
+  .busca-nf .btn { min-width: 96px; }
+  .grade-campos { grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+  .grade-campos label { font-size: .7rem; }
+  .grade-campos label.largo { grid-column: 1 / -1; }
+  .grade-campos .campo { min-height: 40px; font-size: 14px; padding: 8px 10px; }
+  .combo-lista { max-height: 46vh; }
+  .combo-item { padding: 12px 12px; font-size: 1rem; }
+  .btn-confirmar { position: sticky; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.55), 0 6px 20px rgba(37,99,235,.35); }
+
+  /* tabelas viram cartões */
+  .cartoes { display: flex; flex-direction: column; gap: 10px; }
+  .cartoes-topo { display: flex; align-items: center; gap: 10px; padding: 4px 4px 10px; color: var(--txt2); font-weight: 600; }
+  .cartoes-topo input { width: 24px; height: 24px; accent-color: var(--acc); }
+  .cartao-linha { background: rgba(15, 23, 42, .9); border: 1px solid var(--borda-forte); border-radius: 14px; padding: 12px; }
+  .cartao-linha.tocavel { cursor: pointer; }
+  .cartao-linha.marcada { border-color: var(--acc); background: rgba(37, 99, 235, .16); box-shadow: 0 0 0 2px rgba(59,130,246,.35); }
+  .cl-cab { display: flex; align-items: flex-start; gap: 10px; }
+  .cl-antes input { width: 26px; height: 26px; accent-color: var(--acc); margin: 0; }
+  .cl-titulo { flex: 1; min-width: 0; font-weight: 800; font-size: 1rem; line-height: 1.25; }
+  .cl-titulo span { display: block; font-weight: 600; font-size: .86rem; color: var(--txt2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cl-depois .btn { min-height: 38px; }
+  .cl-sub { color: var(--txt2); font-size: .82rem; margin-top: 4px; }
+  .cl-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--borda); }
+  .cl-campo { min-width: 0; }
+  .cl-campo small { display: block; font-size: .66rem; color: var(--txt3); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .cl-campo b { display: block; font-size: .9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rodape-tabela { font-size: .82rem; padding-top: 10px; }
+  .linha-ferramentas { flex-direction: column; align-items: stretch; }
+  .linha-ferramentas .campo.busca { min-width: 0; width: 100%; }
+
+  /* roteirização: com notas marcadas, o formulário fica fixo embaixo */
+  .lote-fixo {
+    position: fixed; left: 8px; right: 8px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 45;
+    background: #0b1324; border: 1px solid var(--acc); border-radius: 16px; padding: 4px 12px 12px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,.6); max-height: 60vh; overflow: auto;
+  }
+  .lote-fixo .divisor { margin: 8px 0 6px; }
+  .lote-fixo .chips-resumo { margin: 6px 0; gap: 6px; }
+  .lote-fixo .chip-resumo { padding: 4px 9px; font-size: .74rem; }
+  .lote-fixo .form-lote { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .form-lote .rotulo { min-width: 0; }
+  .form-lote .campo { width: 100%; min-width: 0; }
+  .lote-fixo .btn-roteirizar { grid-column: 1 / -1; }
+  .espaco-lote { height: 260px; }
+  .form-lote .btn-roteirizar { min-height: 50px; font-size: 1rem; }
+
+  /* histórico */
+  .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi { padding: 12px 12px; }
+  .kpi .val { font-size: 1.15rem; }
+  .kpi span.ico { font-size: 1.1rem; right: 10px; top: 10px; }
+  .filtros-hist { grid-template-columns: 1fr; }
+  .grafico { padding: 10px; }
+}
+@media (max-width: 380px) {
+  .cl-campos { grid-template-columns: 1fr; }
+  .marca b span { display: none; }
+}
