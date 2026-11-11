@@ -413,3 +413,5 @@ th.filtrado .btn-filtro { background: var(--acc); border-color: var(--acc); colo
   .cl-campos { grid-template-columns: 1fr; }
   .marca b span { display: none; }
 }
+.aviso-bairro { margin-top: 6px; font-size: .82rem; color: #fbbf24; }
+.aviso-bairro.ok { color: #4ade80; }
