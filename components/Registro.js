@@ -32,7 +32,8 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
     try {
       const r = await api(`/api/nota?nf=${encodeURIComponent(nf.trim())}&data=${dataUsar}`);
       setResultado(r);
-      setMotivo(""); setMotivoOutro(""); setBairro("");
+      setMotivo(""); setMotivoOutro("");
+      setBairro(r?.nota?.bairro && BAIRROS_MANAUS.includes(r.nota.bairro) ? r.nota.bairro : ""); // vem da aba "bairro" da base
     } catch (e) {
       setResultado({ erro: e.message });
     } finally {
@@ -168,6 +169,12 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
 
             <div className="divisor">📍 Bairro</div>
             <ComboBairro valor={bairro} aoMudar={(b) => { setBairro(b); setErroForm(""); }} />
+            {cur.bairro && bairro === cur.bairro && (
+              <div className="aviso-bairro ok">✔ Bairro preenchido pela base ({cur.bairro_origem === "pedido" ? "pelo pedido" : "pelo código do cliente"}). Se estiver errado, é só trocar.</div>
+            )}
+            {!cur.bairro && cur.bairro_base && !bairro && (
+              <div className="aviso-bairro">A base diz <b>{cur.bairro_base}</b>, mas esse nome não está na lista de bairros — escolha o bairro certo acima.</div>
+            )}
 
             {erroForm && <div className="aviso erro">❌ {erroForm}</div>}
             <div style={{ height: 14 }} />
