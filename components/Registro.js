@@ -33,7 +33,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
       const r = await api(`/api/nota?nf=${encodeURIComponent(nf.trim())}&data=${dataUsar}`);
       setResultado(r);
       setMotivo(""); setMotivoOutro("");
-      setBairro(r?.nota?.bairro && BAIRROS_MANAUS.includes(r.nota.bairro) ? r.nota.bairro : ""); // vem da aba "bairro" da base
+      setBairro(r?.nota?.bairro || ""); // bairro vinculado à nota na base ROAD (automático)
     } catch (e) {
       setResultado({ erro: e.message });
     } finally {
@@ -44,7 +44,7 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
   async function confirmar() {
     const m = motivo === OUTRO ? motivoOutro.trim() : motivo;
     if (!m) return setErroForm(motivo === OUTRO ? "Digite o Motivo no campo acima antes de confirmar." : "Selecione um Motivo antes de confirmar.");
-    if (!BAIRROS_MANAUS.includes(bairro)) return setErroForm("Selecione um Bairro da lista antes de confirmar.");
+    if (!BAIRROS_MANAUS.includes(bairro) && !(bairro && bairro === cur?.bairro)) return setErroForm("Selecione um Bairro da lista antes de confirmar.");
     if (retro && !dataRetro) return setErroForm("Registro retroativo: informe a data em que a nota voltou.");
     setSalvando(true);
     setErroForm("");
@@ -170,12 +170,8 @@ export default function Registro({ linhas, hoje, api, recarregar, avisar }) {
             <div className="divisor">📍 Bairro</div>
             <ComboBairro valor={bairro} aoMudar={(b) => { setBairro(b); setErroForm(""); }} />
             {cur.bairro && bairro === cur.bairro && (
-              <div className="aviso-bairro ok">✔ Bairro preenchido pela base ({cur.bairro_origem === "pedido" ? "pelo pedido" : "pelo código do cliente"}). Se estiver errado, é só trocar.</div>
+              <div className="aviso-bairro ok">✔ Bairro puxado automaticamente da nota (base ROAD){BAIRROS_MANAUS.includes(cur.bairro) ? "" : " — fora da lista oficial"}. Se estiver errado, é só trocar.</div>
             )}
-            {!cur.bairro && cur.bairro_base && !bairro && (
-              <div className="aviso-bairro">A base diz <b>{cur.bairro_base}</b>, mas esse nome não está na lista de bairros — escolha o bairro certo acima.</div>
-            )}
-
             {erroForm && <div className="aviso erro">❌ {erroForm}</div>}
             <div style={{ height: 14 }} />
             <button className="btn primario grande btn-confirmar" onClick={confirmar} disabled={salvando}>
